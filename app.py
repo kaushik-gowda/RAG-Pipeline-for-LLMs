@@ -4,12 +4,9 @@
 """
 A beautiful web UI for the RAG pipeline.
 
-Usage (local):
+Usage:
     python app.py
-    Then open http://localhost:7860 in your browser.
-
-Production:
-    gunicorn --bind 0.0.0.0:7860 --timeout 120 app:app
+    Then open http://localhost:5000 in your browser.
 """
 
 from flask import Flask, render_template, request, jsonify
@@ -58,12 +55,5 @@ def api_ask():
     return jsonify(result), 200
 
 
-@app.route("/health")
-def health():
-    """Health check endpoint for deployment platforms."""
-    return jsonify({"status": "healthy"}), 200
-
-
 if __name__ == "__main__":
-    print(f"Starting RAG Pipeline on http://{FLASK_HOST}:{FLASK_PORT}")
     app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG)

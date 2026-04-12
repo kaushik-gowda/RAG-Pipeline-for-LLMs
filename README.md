@@ -12,7 +12,7 @@ pinned: false
 
 A **Retrieval-Augmented Generation** pipeline that fetches knowledge from Wikipedia, indexes it with FAISS, and answers questions using a Hugging Face QA model — reducing hallucinations by grounding answers in real-world context.
 
-**🔗 Live Demo**: [Try it on Hugging Face Spaces](https://huggingface.co/spaces/kaushik-gowda/RAG-Pipeline-for-LLMs)
+**🔗 Live Demo**: [Try it on Hugging Face Spaces](https://huggingface.co/spaces/Kaushikgowda/RAG-Pipeline-for-LLMs)
 
 ## Architecture
 
