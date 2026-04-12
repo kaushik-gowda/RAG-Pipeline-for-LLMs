@@ -1,6 +1,7 @@
 # ============================================================
 # Configuration for the RAG Pipeline
 # ============================================================
+import os
 
 # Embedding model used for both chunking (tokenizer) and encoding
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
@@ -17,5 +18,5 @@ TOP_K = 3               # number of top chunks to retrieve
 
 # Flask server
 FLASK_HOST = "0.0.0.0"
-FLASK_PORT = 5000
-FLASK_DEBUG = True
+FLASK_PORT = int(os.environ.get("PORT", 7860))
+FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"

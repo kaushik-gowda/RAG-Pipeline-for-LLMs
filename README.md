@@ -1,6 +1,18 @@
+---
+title: RAG Pipeline for LLMs
+emoji: 🧠
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 🧠 RAG Pipeline for LLMs
 
 A **Retrieval-Augmented Generation** pipeline that fetches knowledge from Wikipedia, indexes it with FAISS, and answers questions using a Hugging Face QA model — reducing hallucinations by grounding answers in real-world context.
+
+**🔗 Live Demo**: [Try it on Hugging Face Spaces](https://huggingface.co/spaces/kaushik-gowda/RAG-Pipeline-for-LLMs)
 
 ## Architecture
 
@@ -29,10 +41,12 @@ User Question
 ├── app.py             # Flask web application
 ├── templates/
 │   └── index.html     # Web UI
-└── requirements.txt   # Python dependencies
+├── Dockerfile         # Container for deployment
+├── requirements.txt   # Python dependencies
+└── RAG_Pipeline_for_LLMs.ipynb  # Step-by-step notebook
 ```
 
-## Setup
+## Local Setup
 
 ### 1. Create a virtual environment
 
@@ -54,11 +68,30 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-Then open [http://localhost:5000](http://localhost:5000)
+Then open [http://localhost:7860](http://localhost:7860)
 
 **Option B – Command Line:**
 ```bash
 python main.py
+```
+
+## Deployment
+
+### Hugging Face Spaces (Recommended — Free)
+
+1. Create a Space at [huggingface.co/new-space](https://huggingface.co/new-space)
+2. Select **Docker** as the SDK
+3. Push this repo to the Space:
+```bash
+git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/RAG-Pipeline-for-LLMs
+git push hf main
+```
+
+### Docker
+
+```bash
+docker build -t rag-pipeline .
+docker run -p 7860:7860 rag-pipeline
 ```
 
 ## How It Works
