@@ -1,13 +1,3 @@
----
-title: RAG Pipeline for LLMs
-emoji: 🧠
-colorFrom: indigo
-colorTo: purple
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # 🧠 RAG Pipeline for LLMs
 
 A **Retrieval-Augmented Generation** pipeline that fetches knowledge from Wikipedia, indexes it with FAISS, and answers questions using a Hugging Face QA model — reducing hallucinations by grounding answers in real-world context.
