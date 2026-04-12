@@ -1,7 +1,6 @@
 # ============================================================
 # Configuration for the RAG Pipeline
 # ============================================================
-import os
 
 # Embedding model used for both chunking (tokenizer) and encoding
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
@@ -17,6 +16,7 @@ CHUNK_OVERLAP = 20      # overlapping tokens between consecutive chunks
 TOP_K = 3               # number of top chunks to retrieve
 
 # Flask server
+# Port 7860 is required for Hugging Face Spaces deployment
 FLASK_HOST = "0.0.0.0"
-FLASK_PORT = int(os.environ.get("PORT", 7860))
-FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+FLASK_PORT = 7860
+FLASK_DEBUG = False  # Set to False for production

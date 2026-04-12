@@ -1,32 +1,35 @@
-FROM python:3.12-slim
+# Use official Python runtime as base image
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies for ML libraries
+RUN apt-get update && apt-get install -y \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for Docker layer caching
+# Copy requirements first for better layer caching
 COPY requirements.txt .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir gunicorn
 
 # Copy application code
 COPY . .
 
-# Expose port (Hugging Face Spaces expects 7860)
+# Expose port (7860 for Hugging Face Spaces, 5000 for local)
 EXPOSE 7860
 
-# Pre-download models during build to speed up startup
-RUN python -c "\
-from sentence_transformers import SentenceTransformer; \
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering; \
-SentenceTransformer('sentence-transformers/all-mpnet-base-v2'); \
-AutoTokenizer.from_pretrained('deepset/roberta-base-squad2'); \
-AutoModelForQuestionAnswering.from_pretrained('deepset/roberta-base-squad2'); \
-print('Models downloaded successfully')"
+# Set Flask environment variables
+ENV FLASK_APP=app.py
+ENV FLASK_HOST=0.0.0.0
+ENV FLASK_PORT=7860
 
-# Run with gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--timeout", "120", "--workers", "1", "--threads", "2", "app:app"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:7860/ || exit 1
+
+# Run the Flask application
+CMD ["python", "app.py"]
