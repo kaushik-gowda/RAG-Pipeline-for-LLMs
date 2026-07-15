@@ -443,8 +443,8 @@
                 <span class="step-badge">Step 2</span>
             </div>
             <div class="input-group">
-                <input type="text" id="question-input" placeholder="Type your question about the topic…" disabled />
-                <button class="btn btn-primary" id="ask-btn" onclick="askQuestion()" disabled>
+                <input type="text" id="question-input" placeholder="Type your question or leave it blank for a topic summary…" />
+                <button class="btn btn-primary" id="ask-btn" onclick="askQuestion()">
                     Get Answer
                 </button>
             </div>
@@ -490,6 +490,7 @@
     <script>
         /* ===== State ===== */
         let topicLoaded = false;
+        let currentTopic = '';
         const history = [];
 
         /* ===== DOM Helpers ===== */
@@ -533,6 +534,7 @@
                 if (data.success) {
                     showStatus('ingest-status', 'success', `✅ ${data.message}`);
                     topicLoaded = true;
+                    currentTopic = topic;
                     $('question-input').disabled = false;
                     $('ask-btn').disabled = false;
                     $('question-input').focus();
@@ -554,7 +556,20 @@
         /* ===== Step 2: Ask ===== */
         async function askQuestion() {
             const question = $('question-input').value.trim();
-            if (!question || !topicLoaded) return;
+            const topic = $('topic-input').value.trim();
+
+            if (!question && !topicLoaded && !topic) {
+                showStatus('ask-status', 'error', '❌ Enter a topic first, then ask a question or leave it blank for a topic summary.');
+                return;
+            }
+
+            const effectiveTopic = topic || currentTopic;
+            const effectiveQuestion = question || (effectiveTopic ? `What is ${effectiveTopic}?` : '');
+
+            if (!effectiveQuestion) {
+                showStatus('ask-status', 'error', '❌ Enter a question or a topic to search.');
+                return;
+            }
 
             $('ask-btn').disabled = true;
             showStatus('ask-status', 'loading', 'Retrieving context & generating answer…');
@@ -563,7 +578,7 @@
                 const res = await fetch('/api/ask', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question }),
+                    body: JSON.stringify({ question: effectiveQuestion, topic: effectiveTopic }),
                 });
                 const data = await res.json();
 
@@ -595,7 +610,7 @@
                 $('answer-section').classList.add('visible');
 
                 // Add to history
-                history.unshift({ question, answer: data.answer, score: data.score });
+                history.unshift({ question: effectiveQuestion, answer: data.answer, score: data.score });
                 renderHistory();
 
             } catch (err) {

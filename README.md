@@ -60,6 +60,9 @@ python app.py
 ```
 Then open [http://localhost:7860](http://localhost:7860)
 
+In the web UI, you can type any Wikipedia topic and a question. If you leave
+the question blank, the app will generate a simple summary query for that topic.
+
 **Option B – Command Line:**
 ```bash
 python main.py
