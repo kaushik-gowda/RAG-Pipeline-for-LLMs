@@ -2,8 +2,6 @@
 
 A **Retrieval-Augmented Generation** pipeline that fetches knowledge from Wikipedia, indexes it with FAISS, and answers questions using a Hugging Face QA model — reducing hallucinations by grounding answers in real-world context.
 
-**🔗 Live Demo**: [Try it on Hugging Face Spaces](https://huggingface.co/spaces/Kaushikgowda/RAG-Pipeline-for-LLMs)
-
 ## Architecture
 
 ```
@@ -70,17 +68,15 @@ python main.py
 
 ## Deployment
 
-### Hugging Face Spaces (Recommended — Free)
+### Local or Docker Deployment
 
-1. Create a Space at [huggingface.co/new-space](https://huggingface.co/new-space)
-2. Select **Docker** as the SDK
-3. Push this repo to the Space:
+If you want to run the project locally, use:
+
 ```bash
-git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/RAG-Pipeline-for-LLMs
-git push hf main
+python app.py
 ```
 
-### Docker
+If you want to package it as a container, use Docker:
 
 ```bash
 docker build -t rag-pipeline .
