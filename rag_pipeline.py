@@ -21,24 +21,17 @@ class RAGPipeline:
         self.document: str | None = None
         self.chunks: list[str] = []
 
-    # ----------------------------------------------------------
-    # Step 1 & 2: Ingest a topic
-    # ----------------------------------------------------------
-    def ingest(self, topic: str) -> dict:
-        """Fetch Wikipedia content for *topic*, chunk it, and index it.
-
-        Returns
-        -------
-        dict
-            ``success`` (bool), ``message`` (str), ``num_chunks`` (int).
-        """
+    def _ingest_topic(self, topic: str) -> dict:
+        """Fetch, chunk, and index a Wikipedia topic."""
         print(f"[pipeline] Ingesting topic: {topic}")
 
         document = get_wikipedia_content(topic)
         if document is None:
             return {
                 "success": False,
-                "message": f"Could not retrieve Wikipedia content for '{topic}'.",
+                "message": (
+                    f"Could not retrieve Wikipedia content for '{topic}'."
+                ),
                 "num_chunks": 0,
             }
 
@@ -52,20 +45,42 @@ class RAGPipeline:
 
         return {
             "success": True,
-            "message": f"Successfully indexed '{topic}' ({len(self.chunks)} chunks).",
+            "message": (
+                f"Successfully indexed '{topic}' ({len(self.chunks)} chunks)."
+            ),
             "num_chunks": len(self.chunks),
         }
 
     # ----------------------------------------------------------
+    # Step 1 & 2: Ingest a topic
+    # ----------------------------------------------------------
+    def ingest(self, topic: str) -> dict:
+        """Fetch Wikipedia content for *topic*, chunk it, and index it.
+
+        Returns
+        -------
+        dict
+            ``success`` (bool), ``message`` (str), ``num_chunks`` (int).
+        """
+        return self._ingest_topic(topic)
+
+    # ----------------------------------------------------------
     # Step 3 & 4: Ask a question
     # ----------------------------------------------------------
-    def ask(self, question: str, top_k: int = TOP_K) -> dict:
+    def ask(
+        self,
+        question: str,
+        topic: str | None = None,
+        top_k: int = TOP_K,
+    ) -> dict:
         """Retrieve relevant chunks and generate an answer.
 
         Parameters
         ----------
         question : str
             The user's question about the ingested topic.
+        topic : str | None
+            Optional Wikipedia topic to ingest before answering.
         top_k : int
             Number of chunks to retrieve.
 
@@ -75,12 +90,40 @@ class RAGPipeline:
             ``answer`` (str), ``score`` (float),
             ``retrieved_chunks`` (list[str]).
         """
+        if topic:
+            topic = topic.strip()
+            if topic and topic != self.topic:
+                ingest_result = self._ingest_topic(topic)
+                if not ingest_result["success"]:
+                    return {
+                        "answer": "",
+                        "score": 0.0,
+                        "retrieved_chunks": [],
+                        "error": ingest_result["message"],
+                    }
+
+        if not question.strip():
+            if self.topic:
+                question = f"What is {self.topic}?"
+            else:
+                return {
+                    "answer": "",
+                    "score": 0.0,
+                    "retrieved_chunks": [],
+                    "error": (
+                        "Enter a question or provide a topic to search first."
+                    ),
+                }
+
         if not self.chunks:
             return {
                 "answer": "",
                 "score": 0.0,
                 "retrieved_chunks": [],
-                "error": "No topic has been ingested yet. Call ingest() first.",
+                "error": (
+                    "No topic has been ingested yet. Call ingest() first "
+                    "or provide a topic."
+                ),
             }
 
         # Retrieve
