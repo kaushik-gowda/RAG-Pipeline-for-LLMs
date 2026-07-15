@@ -54,9 +54,9 @@ def main() -> None:
             continue
 
         if not question:
-            continue
+            question = f"What is {topic}?"
 
-        answer_data = pipeline.ask(question)
+        answer_data = pipeline.ask(question, topic=topic)
 
         if "error" in answer_data:
             print(f"\n❌ {answer_data['error']}\n")
@@ -64,7 +64,10 @@ def main() -> None:
 
         print(f"\n💡 Answer: {answer_data['answer']}")
         print(f"   Confidence: {answer_data['score']:.2%}")
-        print(f"   Based on {len(answer_data['retrieved_chunks'])} retrieved chunks.\n")
+        print(
+            f"   Based on {len(answer_data['retrieved_chunks'])} "
+            "retrieved chunks.\n"
+        )
 
 
 if __name__ == "__main__":

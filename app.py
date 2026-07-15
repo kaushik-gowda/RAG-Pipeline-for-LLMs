@@ -31,7 +31,10 @@ def api_ingest():
     topic = data.get("topic", "").strip()
 
     if not topic:
-        return jsonify({"success": False, "message": "Topic cannot be empty."}), 400
+        return (
+            jsonify({"success": False, "message": "Topic cannot be empty."}),
+            400,
+        )
 
     result = pipeline.ingest(topic)
     status_code = 200 if result["success"] else 404
@@ -40,14 +43,12 @@ def api_ingest():
 
 @app.route("/api/ask", methods=["POST"])
 def api_ask():
-    """Ask a question against the ingested knowledge base."""
+    """Ask a question against the ingested knowledge base or a new topic."""
     data = request.get_json(force=True)
     question = data.get("question", "").strip()
+    topic = data.get("topic", "").strip()
 
-    if not question:
-        return jsonify({"error": "Question cannot be empty."}), 400
-
-    result = pipeline.ask(question)
+    result = pipeline.ask(question=question, topic=topic or None)
 
     if "error" in result:
         return jsonify(result), 400
